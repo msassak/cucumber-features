@@ -3,8 +3,42 @@ Feature: Core feature elements execution
   As a developer
   I want Cucumber to run core feature elements
 
+  Background:
+    Given these mappings:
+      | From                        | To                   |
+      | "a passing step"            | "passing"            |
+      | "a passing step", DocString | "passing", DocString |
+      | "a failing step"            | "failing"            |
+      | "a pending step"            | "pending"            |
+    And a scenario named "Passing" with "Given a passing step"
+    And a scenario named "Failing" with:
+      """
+      Given a passing step
+      Then a failing step
+      """
+
+  Scenario: Passing scenario:
+    When cucumber executes the "Passing" scenario
+    Then the results are:
+    """
+    [
+        {
+            "name": "Passing",
+            "result": "passed"
+        }
+    ]
+    """
+
   Scenario: Simple flat steps
-    Given a step definition matching /^a step passes$/
+    When cucumber executes a scenario containing only passing steps
+    When I run this scenario:
+      """
+      Given a passing step
+      When a passing step
+      Then a passing step
+      """
+    Then there should be no errors, warnings or announcements
+
     When I run the following feature:
       """
       Feature: Simple flat steps
